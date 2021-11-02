@@ -32,10 +32,7 @@ namespace EnergyAPI.Controllers
         [HttpGet("{id}")]
         public EnergyGeneration GetEnergyGeneration(int id)
         {
-            return new EnergyGeneration {
-                Year = 2021,
-                Region = "Test"
-            };
+            return dbContext.EnergyGeneration.Where(eg => eg.Id == id).Single();
         }
     }
 }

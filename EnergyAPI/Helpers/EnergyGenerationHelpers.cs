@@ -9,34 +9,30 @@ using System.Threading.Tasks;
 namespace EnergyAPI.Helpers {
     public static class EnergyGenerationHelpers {
         public static IEnumerable<EnergyGeneration> FilterEnergyGeneration(this DbSet<EnergyGeneration> energyGenerations, EnergyGenerationFilter filter) {
-            return energyGenerations.FilterYear(filter.Year).FilterRegion(filter.Region).FilterWind2(filter.Wind2);
+            return energyGenerations
+                .Filter("Year", filter.Year)
+                .Filter("Region", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(filter.Region.Replace('-', ' ')))
+                .Filter("Wind2", filter.Wind2)
+                .Filter("WaveAndTidal", filter.WaveAndTidal)
+                .Filter("SolarPv", filter.SolarPv)
+                .Filter("Hydro", filter.Hydro)
+                .Filter("LandfillGas", filter.LandfillGas)
+                .Filter("OtherBioEnergy", filter.OtherBioEnergy)
+                .Filter("Total", filter.Total);
 
+            // Need to create 
         }
 
-        private static IQueryable<EnergyGeneration> FilterYear(this IQueryable<EnergyGeneration> source, int? year) {
-            
-            if(!year.HasValue)
+        private static IQueryable<EnergyGeneration> Filter<T>(this IQueryable<EnergyGeneration> source, string property, T filter) {
+
+            if(filter == null)
                 return source;
 
-            return source.Where(eg => eg.Year == year);
-        }
+            var parameter = Expression.Parameter(typeof(EnergyGeneration));
+            var accessor = Expression.Property(parameter, property);
+            var lambda = Expression.Lambda<Func<EnergyGeneration, bool>>(Expression.Equal(accessor, Expression.Constant(filter)), parameter);
 
-        private static IQueryable<EnergyGeneration> FilterRegion(this IQueryable<EnergyGeneration> source, string region) {
-
-            if(region.Length == 0)
-                return source;
-
-            // Need to transform to normal text
-
-            return source.Where(eg => eg.Region == region);
-        }
-
-        private static IQueryable<EnergyGeneration> FilterWind2(this IQueryable<EnergyGeneration> source, decimal? wind2) {
-
-            if(!wind2.HasValue)
-                return source;
-
-            return source.Where(eg => eg.Wind2 == wind2);
+            return source.Where(lambda);
         }
     }
 }
