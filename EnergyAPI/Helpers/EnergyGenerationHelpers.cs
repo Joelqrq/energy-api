@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace EnergyAPI.Helpers {
     public static class EnergyGenerationHelpers {
-        public static IEnumerable<EnergyGeneration> FilterEnergyGeneration(this DbSet<EnergyGeneration> energyGenerations, EnergyGenerationFilter filter) {
-            return energyGenerations
+        public static IQueryable<EnergyGeneration> FilterEnergyGeneration(this IQueryable<EnergyGeneration> query, EnergyGenerationFilter filter) {
+            
+            return query
                 .Filter("Year", filter.Year)
                 .Filter("Region", filter.Region.TransformKebabCaseToTitleCase())
                 .Filter("Wind2", filter.Wind2)
@@ -19,8 +20,20 @@ namespace EnergyAPI.Helpers {
                 .Filter("LandfillGas", filter.LandfillGas)
                 .Filter("OtherBioEnergy", filter.OtherBioEnergy)
                 .Filter("Total", filter.Total);
+        }
 
-            // Need to create 
+        public static IQueryable<EnergyGeneration> FilterPage(this IQueryable<EnergyGeneration> query, int? page) {
+
+            if(!page.HasValue)
+                page = 0;
+
+            var takeAmount = 2;
+            int skipAmount = (page.Value - 1) * takeAmount;
+
+            return query
+                .OrderBy(eg => eg.Id)
+                .Skip(skipAmount)
+                .Take(takeAmount);
         }
 
         private static IQueryable<EnergyGeneration> Filter<T>(this IQueryable<EnergyGeneration> source, string property, T filter) {
