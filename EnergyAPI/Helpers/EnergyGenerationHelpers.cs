@@ -11,7 +11,7 @@ namespace EnergyAPI.Helpers {
         public static IEnumerable<EnergyGeneration> FilterEnergyGeneration(this DbSet<EnergyGeneration> energyGenerations, EnergyGenerationFilter filter) {
             return energyGenerations
                 .Filter("Year", filter.Year)
-                .Filter("Region", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(filter.Region.Replace('-', ' ')))
+                .Filter("Region", filter.Region.TransformKebabCaseToTitleCase())
                 .Filter("Wind2", filter.Wind2)
                 .Filter("WaveAndTidal", filter.WaveAndTidal)
                 .Filter("SolarPv", filter.SolarPv)
@@ -33,6 +33,14 @@ namespace EnergyAPI.Helpers {
             var lambda = Expression.Lambda<Func<EnergyGeneration, bool>>(Expression.Equal(accessor, Expression.Constant(filter)), parameter);
 
             return source.Where(lambda);
+        }
+
+        private static string TransformKebabCaseToTitleCase(this string value) {
+            
+            if(string.IsNullOrEmpty(value))
+                return value;
+
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.Replace('-', ' '));
         }
     }
 }
