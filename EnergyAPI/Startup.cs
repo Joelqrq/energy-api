@@ -67,6 +67,11 @@ namespace EnergyAPI {
                 options.Password.RequireUppercase = false;
             });
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+                options.InstanceName = "EnergyAPI_";
+            });
 
             services.AddControllers();
         }

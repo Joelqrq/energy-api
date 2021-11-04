@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -27,13 +26,13 @@ namespace EnergyAPI.Controllers {
         }
 
         [HttpPost("registration")]
-        public async Task<IActionResult> Register([FromBody]Credentials credentials) {
-            
+        public async Task<IActionResult> Register([FromBody] Credentials credentials) {
+
             if(credentials == null) {
                 return new BadRequestObjectResult(new { message = "Registration failed" });
             }
-            
-            
+
+
             var identityUser = new IdentityUser() { UserName = credentials.UserName };
             var result = await userManager.CreateAsync(identityUser, credentials.Password);
             if(!result.Succeeded) {
@@ -47,9 +46,9 @@ namespace EnergyAPI.Controllers {
 
             return Ok(new { message = "Registration successfully" });
         }
-        
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]Credentials credentials) {
+        public async Task<IActionResult> Login([FromBody] Credentials credentials) {
 
             IdentityUser identityUser;
 

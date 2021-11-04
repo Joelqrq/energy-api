@@ -4,8 +4,12 @@ using EnergyAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace EnergyAPI.Controllers {
     [Route("api/[controller]")]
@@ -13,22 +17,43 @@ namespace EnergyAPI.Controllers {
     [Authorize]
     public class EnergyGenerationController : ControllerBase {
         private readonly EnergyGenerationDbContext dbContext;
+        private readonly IDistributedCache cache;
 
-        public EnergyGenerationController(EnergyGenerationDbContext context) {
+        public EnergyGenerationController(EnergyGenerationDbContext context, IDistributedCache cache) {
             dbContext = context;
+            this.cache = cache;
         }
 
         [HttpGet]
-        public IEnumerable<EnergyGeneration> GetEnergyGenerations([FromQuery] int? page, [FromQuery] EnergyGenerationFilter filters) {
+        public async Task<string> GetEnergyGenerations([FromQuery] int? page, [FromQuery] EnergyGenerationFilter filters) {
 
             // Need to log query
-            return dbContext.EnergyGeneration.AsNoTracking().FilterEnergyGeneration(filters).FilterPage(page).ToList();
+            var energyGenerations = await cache.GetCacheAsync<IEnumerable<EnergyGeneration>>($"{page}{JsonSerializer.Serialize(filters)}");
+            Console.WriteLine(energyGenerations);
+
+            if(energyGenerations != null) {
+                return JsonSerializer.Serialize(new { source = energyGenerations, message = "cache" });
+            }
+
+            energyGenerations = await dbContext.EnergyGeneration.AsNoTracking().FilterEnergyGeneration(filters).FilterPage(page).ToListAsync();
+            await cache.SetCacheAsync($"{page}{JsonSerializer.Serialize(filters)}", energyGenerations);
+
+            return JsonSerializer.Serialize(new { source = energyGenerations, message = "non-cache" });
         }
 
         [HttpGet("{id}")]
-        public EnergyGeneration GetEnergyGeneration(int id) {
+        public async Task<string> GetEnergyGeneration(int id) {
+
+           var energyGeneration = await cache.GetCacheAsync<EnergyGeneration>($"{id}");
             // Need to log query
-            return dbContext.EnergyGeneration.Where(eg => eg.Id == id).Single();
+            if(energyGeneration != null) {
+                return JsonSerializer.Serialize(new { source = energyGeneration, message = "cache" });
+            }
+
+            energyGeneration = dbContext.EnergyGeneration.Where(eg => eg.Id == id).Single();
+            await cache.SetCacheAsync($"{id}", energyGeneration);
+
+            return JsonSerializer.Serialize(new { source = energyGeneration, message = "non-cache" });
         }
 
         [HttpPost("add")]
