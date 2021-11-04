@@ -7,6 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using EnergyAPI.Configurations;
 
 namespace EnergyAPI {
     public class Startup {
@@ -32,6 +37,27 @@ namespace EnergyAPI {
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            var tokenSettings = Configuration.GetSection("JwtBearerTokenSettings");
+            services.Configure<JwtBearerTokenSettings>(tokenSettings);
+            var jwtBearerTokenSettings = tokenSettings.Get<JwtBearerTokenSettings>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = true;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters {
+                        ClockSkew = TimeSpan.Zero,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtBearerTokenSettings.SecretKey)),
+                        ValidAudience = jwtBearerTokenSettings.Audience,
+                        ValidIssuer = jwtBearerTokenSettings.Issuer,
+                        ValidateLifetime = true
+                    };
+                });
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -40,6 +66,7 @@ namespace EnergyAPI {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
             });
+
 
             services.AddControllers();
         }

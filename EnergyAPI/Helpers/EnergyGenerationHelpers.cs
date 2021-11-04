@@ -1,15 +1,12 @@
 ﻿using EnergyAPI.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace EnergyAPI.Helpers {
     public static class EnergyGenerationHelpers {
         public static IQueryable<EnergyGeneration> FilterEnergyGeneration(this IQueryable<EnergyGeneration> query, EnergyGenerationFilter filter) {
-            
+
             return query
                 .Filter("Year", filter.Year)
                 .Filter("Region", filter.Region.TransformKebabCaseToTitleCase())
@@ -25,7 +22,7 @@ namespace EnergyAPI.Helpers {
         public static IQueryable<EnergyGeneration> FilterPage(this IQueryable<EnergyGeneration> query, int? page) {
 
             if(!page.HasValue)
-                page = 0;
+                page = 1;
 
             var takeAmount = 2;
             int skipAmount = (page.Value - 1) * takeAmount;
@@ -49,7 +46,7 @@ namespace EnergyAPI.Helpers {
         }
 
         private static string TransformKebabCaseToTitleCase(this string value) {
-            
+
             if(string.IsNullOrEmpty(value))
                 return value;
 
