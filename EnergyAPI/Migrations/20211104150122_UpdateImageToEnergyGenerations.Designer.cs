@@ -3,14 +3,16 @@ using EnergyAPI.DataContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EnergyAPI.Migrations
 {
     [DbContext(typeof(EnergyGenerationDbContext))]
-    partial class EnergyGenerationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211104150122_UpdateImageToEnergyGenerations")]
+    partial class UpdateImageToEnergyGenerations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

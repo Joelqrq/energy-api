@@ -25,20 +25,12 @@ namespace EnergyAPI.Controllers {
         }
 
         [HttpGet]
-        public async Task<string> GetEnergyGenerations([FromQuery] int? page, [FromQuery] EnergyGenerationFilter filters) {
+        public async Task<IEnumerable<EnergyGeneration>> GetEnergyGenerations([FromQuery] int? page, [FromQuery] EnergyGenerationFilter filters) {
 
             // Need to log query
-            var energyGenerations = await cache.GetCacheAsync<IEnumerable<EnergyGeneration>>($"{page}{JsonSerializer.Serialize(filters)}");
-            Console.WriteLine(energyGenerations);
+            var energyGenerations = await dbContext.EnergyGeneration.AsNoTracking().FilterEnergyGeneration(filters).FilterPage(page).ToListAsync();
 
-            if(energyGenerations != null) {
-                return JsonSerializer.Serialize(new { source = energyGenerations, message = "cache" });
-            }
-
-            energyGenerations = await dbContext.EnergyGeneration.AsNoTracking().FilterEnergyGeneration(filters).FilterPage(page).ToListAsync();
-            await cache.SetCacheAsync($"{page}{JsonSerializer.Serialize(filters)}", energyGenerations);
-
-            return JsonSerializer.Serialize(new { source = energyGenerations, message = "non-cache" });
+            return energyGenerations;
         }
 
         [HttpGet("{id}")]

@@ -24,7 +24,7 @@ namespace EnergyAPI.Helpers {
             if(!page.HasValue)
                 page = 1;
 
-            var takeAmount = 2;
+            var takeAmount = 10;
             int skipAmount = (page.Value - 1) * takeAmount;
 
             return query

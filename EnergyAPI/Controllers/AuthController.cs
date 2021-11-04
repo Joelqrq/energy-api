@@ -25,7 +25,7 @@ namespace EnergyAPI.Controllers {
             this.userManager = userManager;
         }
 
-        [HttpPost("registration")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] Credentials credentials) {
 
             if(credentials == null) {

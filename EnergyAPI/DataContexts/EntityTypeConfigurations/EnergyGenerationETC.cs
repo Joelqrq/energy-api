@@ -1,4 +1,7 @@
-﻿using EnergyAPI.Models;
+﻿using System;
+using System.Linq;
+using EnergyAPI.Helpers;
+using EnergyAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -7,6 +10,11 @@ namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
         public void Configure(EntityTypeBuilder<EnergyGeneration> builder) {
 
             builder.HasKey(eg => eg.Id);
+
+            builder
+                .Property(eg => eg.Price)
+                .HasPrecision(14, 2)
+                .HasDefaultValue(0.0m);
 
             builder
                 .Property(eg => eg.Region)
@@ -47,56 +55,24 @@ namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
                 .HasPrecision(14, 1)
                 .HasDefaultValue(0.0m);
 
-            builder.HasData(new EnergyGeneration[] {
-                new EnergyGeneration {
-                    Id = 1,
-                    Year = 2003,
-                    Region = "England",
-                    Wind2 = 349.2m,
-                    WaveAndTidal = 0.0m,
-                    SolarPv = 25.3m,
-                    Hydro = 25.3m,
-                    LandfillGas = 2899.0m,
-                    OtherBioEnergy = 2716.9m,
-                    Total = 5990.4m
-                },
-                new EnergyGeneration {
-                    Id = 2,
-                    Year = 2009,
-                    Region = "Northern Ireland",
-                    Wind2 = 743.8m,
-                    WaveAndTidal = 0.6m,
-                    SolarPv = 0.0m,
-                    Hydro = 30.8m,
-                    LandfillGas = 22.5m,
-                    OtherBioEnergy = 0.8m,
-                    Total = 19.3m
-                },
-                new EnergyGeneration {
-                    Id = 3,
-                    Year = 2013,
-                    Region = "Yorkshire and the Humber",
-                    Wind2 = 774.5m,
-                    WaveAndTidal = 0.2m,
-                    SolarPv = 129.6m,
-                    Hydro = 6.5m,
-                    LandfillGas = 465.3m,
-                    OtherBioEnergy = 31.8m,
-                    Total = 3637.6m
-                },
-                new EnergyGeneration {
-                    Id = 4,
-                    Year = 2015,
-                    Region = "Scotland",
-                    Wind2 = 13833.5m,
-                    WaveAndTidal = 2.0m,
-                    SolarPv = 173.9m,
-                    Hydro = 5757.1m,
-                    LandfillGas = 503.4m,
-                    OtherBioEnergy = 26.2m,
-                    Total = 1331.4m
-                }
-            });
+            var years = new int[4] { 2003, 2004, 2005, 2006 };
+            var regions = new string[4] { "England", "Northern Ireland", "Yorkshire and the Humber", "Scotland" };
+            var random = new Random();
+
+            builder.HasData(Enumerable.Range(1, 50).Select(index => new EnergyGeneration {
+                Id = index,
+                Price = random.NextDecimal(2),
+                Year = years[random.Next(4)],
+                Region = regions[random.Next(4)],
+                Wind2 = random.NextDecimal(),
+                WaveAndTidal = random.NextDecimal(),
+                SolarPv = random.NextDecimal(),
+                Hydro = random.NextDecimal(),
+                LandfillGas = random.NextDecimal(),
+                OtherBioEnergy = random.NextDecimal(),
+                Total = random.NextDecimal(),
+                Image = "https://4d1e-138-75-155-224.ngrok.io/images/energy.jpeg"
+            }));
         }
     }
 }

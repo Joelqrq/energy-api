@@ -84,6 +84,8 @@ namespace EnergyAPI {
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseCors("FrontEndApp");
