@@ -71,7 +71,7 @@ namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
                 LandfillGas = random.NextDecimal(),
                 OtherBioEnergy = random.NextDecimal(),
                 Total = random.NextDecimal(),
-                Image = "https://4d1e-138-75-155-224.ngrok.io/images/energy.jpeg"
+                Image = "https://2776-138-75-155-224.ngrok.io/images/energy.jpeg"
             }));
         }
     }

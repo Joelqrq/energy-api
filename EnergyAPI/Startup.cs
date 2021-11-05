@@ -28,7 +28,8 @@ namespace EnergyAPI {
             {
                 options.AddPolicy("FrontEndApp", builder =>
                 {
-                    builder.WithOrigins(Configuration.GetValue<string>("FrontEndAppOrigin"));
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    //builder.WithOrigins(Configuration.GetValue<string>("FrontEndAppOrigin")).AllowAnyMethod().AllowCredentials();
                 });
             });
 
