@@ -12,6 +12,7 @@ using System.Text;
 using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using EnergyAPI.Configurations;
+using EnergyAPI.Services;
 
 namespace EnergyAPI {
     public class Startup {
@@ -33,7 +34,12 @@ namespace EnergyAPI {
                 });
             });
 
-            services.AddDbContext<EnergyGenerationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("EnergyDatabase")));
+            services.AddHttpClient<NotificationService>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration.GetValue<string>("FrontEndAppOrigin"));
+            });
+
+            services.AddDbContext<EnergyRecordDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("EnergyDatabase")));
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("EnergyDatabase")));
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -93,7 +99,6 @@ namespace EnergyAPI {
 
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.UseEndpoints(endpoints =>
             {

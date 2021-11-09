@@ -5,7 +5,8 @@ using System.Linq.Expressions;
 
 namespace EnergyAPI.Helpers {
     public static class EnergyGenerationHelpers {
-        public static IQueryable<EnergyGeneration> FilterEnergyGeneration(this IQueryable<EnergyGeneration> query, EnergyGenerationFilter filter) {
+
+        public static IQueryable<EnergyRecord> FilterEnergyGeneration(this IQueryable<EnergyRecord> query, EnergyRecordFilter filter) {
 
             return query
                 .Filter("Year", filter.Year)
@@ -19,7 +20,7 @@ namespace EnergyAPI.Helpers {
                 .Filter("Total", filter.Total);
         }
 
-        public static IQueryable<EnergyGeneration> FilterPage(this IQueryable<EnergyGeneration> query, int? page) {
+        public static IQueryable<EnergyRecord> FilterPage(this IQueryable<EnergyRecord> query, int? page) {
 
             if(!page.HasValue)
                 page = 1;
@@ -33,14 +34,14 @@ namespace EnergyAPI.Helpers {
                 .Take(takeAmount);
         }
 
-        private static IQueryable<EnergyGeneration> Filter<T>(this IQueryable<EnergyGeneration> source, string property, T filter) {
+        private static IQueryable<EnergyRecord> Filter<T>(this IQueryable<EnergyRecord> source, string property, T filter) {
 
             if(filter == null)
                 return source;
 
-            var parameter = Expression.Parameter(typeof(EnergyGeneration));
+            var parameter = Expression.Parameter(typeof(EnergyRecord));
             var accessor = Expression.Property(parameter, property);
-            var lambda = Expression.Lambda<Func<EnergyGeneration, bool>>(Expression.Equal(accessor, Expression.Constant(filter)), parameter);
+            var lambda = Expression.Lambda<Func<EnergyRecord, bool>>(Expression.Equal(accessor, Expression.Constant(filter)), parameter);
 
             return source.Where(lambda);
         }

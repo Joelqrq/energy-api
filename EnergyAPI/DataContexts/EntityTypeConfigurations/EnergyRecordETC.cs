@@ -5,9 +5,13 @@ using EnergyAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
-    public class EnergyGenerationETC : IEntityTypeConfiguration<EnergyGeneration> {
-        public void Configure(EntityTypeBuilder<EnergyGeneration> builder) {
+namespace EnergyAPI.DataContexts.EntityTypeConfigurations
+{
+    public class EnergyRecordETC : IEntityTypeConfiguration<EnergyRecord>
+    {
+        public void Configure(EntityTypeBuilder<EnergyRecord> builder)
+        {
+            builder.ToTable("EnergyRecord", "ENERGY_DATASET");
 
             builder.HasKey(eg => eg.Id);
 
@@ -59,7 +63,8 @@ namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
             var regions = new string[4] { "England", "Northern Ireland", "Yorkshire and the Humber", "Scotland" };
             var random = new Random();
 
-            builder.HasData(Enumerable.Range(1, 50).Select(index => new EnergyGeneration {
+            builder.HasData(Enumerable.Range(1, 50).Select(index => new EnergyRecord
+            {
                 Id = index,
                 Price = random.NextDecimal(2),
                 Year = years[random.Next(4)],
@@ -71,7 +76,7 @@ namespace EnergyAPI.DataContexts.EntityTypeConfigurations {
                 LandfillGas = random.NextDecimal(),
                 OtherBioEnergy = random.NextDecimal(),
                 Total = random.NextDecimal(),
-                Image = "https://2776-138-75-155-224.ngrok.io/images/energy.jpeg"
+                Image = "https://localhost:5001/images/energy.jpeg"
             }));
         }
     }

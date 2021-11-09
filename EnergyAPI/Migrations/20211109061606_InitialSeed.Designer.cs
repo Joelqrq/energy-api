@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EnergyAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211102090531_InitialSeed")]
+    [Migration("20211109061606_InitialSeed")]
     partial class InitialSeed
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,5 +1,5 @@
 ﻿namespace EnergyAPI.Models {
-    public class EnergyGenerationFilter {
+    public class EnergyRecordFilter {
         public int? Year { get; set; }
         public string Region { get; set; }
         public decimal? Wind2 { get; set; }
